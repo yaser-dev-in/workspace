@@ -1,0 +1,7 @@
+services:
+  nginx:
+    build: .
+    image: nginx_demo
+    container_name: nginx_demo_container
+    ports:
+      - "4000:80"

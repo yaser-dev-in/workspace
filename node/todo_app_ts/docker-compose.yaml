@@ -1,0 +1,14 @@
+services:
+  mongo_db:
+    image: mongo:7
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+
+  node_app:
+    build: .
+    container_name: todo_app_container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo_db
