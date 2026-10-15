@@ -1,0 +1,39 @@
+name: todo_flutter
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  dio: ^5.11.1
+  uuid: ^4.6.0
+  shared_preferences: ^2.5.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  # 1. Add the version here under dev_dependencies
+  flutter_launcher_icons: ^0.13.1 
+
+# 2. Move the configuration block to the ROOT level (outside of dev_dependencies)
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/app_icon.png"
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+  
+  # 3. Declare the asset folder so Flutter knows it exists
+  assets:
+    - assets/images/app_icon.png
+    - assets/images/todo_list.png
+    

@@ -1,61 +1,33 @@
 import mongoose from "mongoose";
+import { ITodo } from "../interfaces/todo_interfaces";
 
-import {
-    ITodo
-}
-from "../interfaces/todo_interfaces";
+const todoSchema = new mongoose.Schema({
+  id: Number,
+  title: String,
+  isCompleted: Boolean,
+  userId: String
+});
 
-const todoSchema =
-    new mongoose.Schema({
-        id: Number,
-        title: String,
-        isCompleted: Boolean
-    });
+const Todo = mongoose.model("Todo", todoSchema);
 
-const Todo =
-    mongoose.model(
-        "Todo",
-        todoSchema
-    );
-
-const createTodo =
-    async (
-        todo: ITodo
-    ) => {
-        return await Todo.create(
-            todo
-        );
-    };
-
-const getTodo =
-    async () => {
-        return await Todo.find();
-    };
-
-const updateTodo =
-    async (
-        id: number,
-        todo: Partial<ITodo>
-    ) => {
-        return await Todo.findOneAndUpdate(
-            { id },
-            todo,
-            { new: true }
-        );
-    };
-
-const deleteTodo =
-    async (
-        id: number
-    ) => {
-        return await Todo.findOneAndDelete(
-            { id }
-        );
-    };
-
-export {
-    createTodo,
-    getTodo,
-    updateTodo,
-    deleteTodo
+const createTodo = async (todo: ITodo) => {
+  return await Todo.create(todo);
 };
+
+const getTodo = async (userId: string) => {
+  return await Todo.find({ userId });
+};
+
+const updateTodo = async (id: number, userId: string, todo: Partial<ITodo>) => {
+  return await Todo.findOneAndUpdate(
+    { id, userId }, // Security: ensure user only updates their own todo
+    todo,
+    { new: true }
+  );
+};
+
+const deleteTodo = async (id: number, userId: string) => {
+  return await Todo.findOneAndDelete({ id, userId });
+};
+
+export { createTodo, getTodo, updateTodo, deleteTodo };
