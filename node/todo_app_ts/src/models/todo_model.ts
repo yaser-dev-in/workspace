@@ -1,33 +1,50 @@
-import mongoose from "mongoose";
+import TodoRecord from "./todo_record";
 import { ITodo } from "../interfaces/todo_interfaces";
 
-const todoSchema = new mongoose.Schema({
-  id: Number,
-  title: String,
-  isCompleted: Boolean,
-  userId: String
-});
+class TodoModel extends TodoRecord {
+  
+  public async createDatabaseRecord(todoData: ITodo): Promise<any> {
+    console.log("Model Layer: Creating record for title:", todoData.title);
+    return await this.todoDatabaseModel.create(todoData);
+  }
 
-const Todo = mongoose.model("Todo", todoSchema);
+  public async findAllRecordsByUserId(userId: string): Promise<any[]> {
+    console.log("Model Layer: Finding records for userId:", userId);
+    return await this.todoDatabaseModel.find({ userId: userId });
+  }
 
-const createTodo = async (todo: ITodo) => {
-  return await Todo.create(todo);
-};
+  public async updateRecordById(targetId: number, targetUserId: string, updatePayload: Partial<ITodo>): Promise<any> {
+    console.log("Model Layer: Updating record ID:", targetId);
+    
+    // SECURITY FIX: Prevent ID and UserId manipulation
+    const safePayload = { ...updatePayload };
+    delete safePayload.id;
+    delete safePayload.userId;
 
-const getTodo = async (userId: string) => {
-  return await Todo.find({ userId });
-};
+    return await this.todoDatabaseModel.findOneAndUpdate(
+      { id: targetId, userId: targetUserId },
+      safePayload,
+      { returnDocument: "after" }
+    );
+  }
 
-const updateTodo = async (id: number, userId: string, todo: Partial<ITodo>) => {
-  return await Todo.findOneAndUpdate(
-    { id, userId }, // Security: ensure user only updates their own todo
-    todo,
-    { new: true }
-  );
-};
+  public async deleteRecordById(targetId: number, targetUserId: string): Promise<any> {
+    console.log("Model Layer: Deleting record ID:", targetId);
+    return await this.todoDatabaseModel.findOneAndDelete({ id: targetId, userId: targetUserId });
+  }
 
-const deleteTodo = async (id: number, userId: string) => {
-  return await Todo.findOneAndDelete({ id, userId });
-};
+  public async completeAllRecordsByUserId(userId: string): Promise<any> {
+    console.log("Model Layer: Completing all records for userId:", userId);
+    return await this.todoDatabaseModel.updateMany(
+      { userId: userId, isCompleted: false },
+      { isCompleted: true }
+    );
+  }
 
-export { createTodo, getTodo, updateTodo, deleteTodo };
+  public async deleteAllRecordsByUserId(userId: string): Promise<any> {
+    console.log("Model Layer: Deleting all records for userId:", userId);
+    return await this.todoDatabaseModel.deleteMany({ userId: userId });
+  }
+}
+
+export default TodoModel;

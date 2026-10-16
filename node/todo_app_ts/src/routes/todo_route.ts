@@ -1,36 +1,24 @@
-import express
-from "express";
+import { Router } from "express";
+import TodoController from "../controllers/todo_controller";
 
-import {
-    ioCreateTodo,
-    ioGetTodo,
-    ioUpdateTodo,
-    ioDeleteTodo
+class TodoRoutes extends TodoController {
+  public router: Router;
+
+  constructor() {
+    super();
+    this.router = Router();
+    this.initializeRoutePaths();
+  }
+
+  private initializeRoutePaths(): void {
+    // All routes are now POST requests with action-based URLs
+    this.router.post("/todo/create", this.handleCreateTodoRequest.bind(this));
+    this.router.post("/todo/get-all", this.handleGetAllTodosRequest.bind(this));
+    this.router.post("/todo/update", this.handleUpdateTodoRequest.bind(this));
+    this.router.post("/todo/delete", this.handleDeleteTodoRequest.bind(this));
+    this.router.post("/todo/complete-all", this.handleCompleteAllTodosRequest.bind(this));
+    this.router.post("/todo/delete-all", this.handleDeleteAllTodosRequest.bind(this));
+  }
 }
-from "../controllers/todo_controller";
 
-
-const router =
-    express.Router();
-
-router.post(
-    "/todo",
-    ioCreateTodo
-);
-
-router.get(
-    "/todo",
-    ioGetTodo
-);
-
-router.put(
-    "/todo/:id",
-    ioUpdateTodo
-);
-
-router.delete(
-    "/todo/:id",
-    ioDeleteTodo
-);
-
-export default router;
+export default new TodoRoutes().router;

@@ -1,35 +1,80 @@
 import { Request, Response } from "express";
-import {
-  createTodoService,
-  getTodoService,
-  updateTodoService,
-  deleteTodoService
-} from "../services/todo_service";
+import TodoService from "../services/todo_service";
 
-const ioCreateTodo = async (req: Request, res: Response): Promise<void> => {
-  const result = await createTodoService(req.body.todo);
-  res.status(201).json(result);
-};
+class TodoController extends TodoService {
 
-const ioGetTodo = async (req: Request, res: Response): Promise<void> => {
-  const userId = req.query.userId as string;
-  const result = await getTodoService(userId);
-  res.status(200).json(result);
-};
+  public async handleCreateTodoRequest(requestObject: Request, responseObject: Response): Promise<void> {
+    console.log("Controller: Received POST /todo/create");
+    try {
+      const createdRecord = await this.createTodoServiceMethod(requestObject.body.todoData);
+      responseObject.status(201).json(createdRecord);
+    } catch (error) {
+      console.error("Controller Error:", error);
+      responseObject.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 
-const ioUpdateTodo = async (req: Request, res: Response): Promise<void> => {
-  const result = await updateTodoService(
-    Number(req.params.id),
-    req.body.todo.userId,
-    req.body.todo
-  );
-  res.status(200).json(result);
-};
+  public async handleGetAllTodosRequest(requestObject: Request, responseObject: Response): Promise<void> {
+    const extractedUserId = requestObject.body.userId; // Changed from query to body
+    console.log("Controller: Received POST /todo/get-all for userId:", extractedUserId);
+    try {
+      const fetchedRecords = await this.getAllTodosServiceMethod(extractedUserId);
+      responseObject.status(200).json(fetchedRecords);
+    } catch (error) {
+      console.error("Controller Error:", error);
+      responseObject.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 
-const ioDeleteTodo = async (req: Request, res: Response): Promise<void> => {
-  const userId = req.query.userId as string;
-  const result = await deleteTodoService(Number(req.params.id), userId);
-  res.status(200).json(result);
-};
+  public async handleUpdateTodoRequest(requestObject: Request, responseObject: Response): Promise<void> {
+    const extractedId = requestObject.body.todoData.id; // Changed from params to body
+    const extractedUserId = requestObject.body.todoData.userId; // Changed from body.todo to body.todoData
+    console.log("Controller: Received POST /todo/update for ID:", extractedId);
+    try {
+      const updatedRecord = await this.updateTodoServiceMethod(extractedId, extractedUserId, requestObject.body.todoData);
+      responseObject.status(200).json(updatedRecord);
+    } catch (error) {
+      console.error("Controller Error:", error);
+      responseObject.status(500).json({ message: "Internal Server Error" });
+    }
+  }
 
-export { ioCreateTodo, ioGetTodo, ioUpdateTodo, ioDeleteTodo };
+  public async handleDeleteTodoRequest(requestObject: Request, responseObject: Response): Promise<void> {
+    const extractedId = requestObject.body.todoId; // Changed from params to body
+    const extractedUserId = requestObject.body.userId; // Changed from query to body
+    console.log("Controller: Received POST /todo/delete for ID:", extractedId);
+    try {
+      await this.deleteTodoServiceMethod(extractedId, extractedUserId);
+      responseObject.status(200).json({ message: "Deleted successfully" });
+    } catch (error) {
+      console.error("Controller Error:", error);
+      responseObject.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  public async handleCompleteAllTodosRequest(requestObject: Request, responseObject: Response): Promise<void> {
+    const extractedUserId = requestObject.body.userId;
+    console.log("Controller: Received POST /todo/complete-all");
+    try {
+      await this.completeAllTodosServiceMethod(extractedUserId);
+      responseObject.status(200).json({ message: "All completed" });
+    } catch (error) {
+      console.error("Controller Error:", error);
+      responseObject.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+
+  public async handleDeleteAllTodosRequest(requestObject: Request, responseObject: Response): Promise<void> {
+    const extractedUserId = requestObject.body.userId;
+    console.log("Controller: Received POST /todo/delete-all");
+    try {
+      await this.deleteAllTodosServiceMethod(extractedUserId);
+      responseObject.status(200).json({ message: "All deleted" });
+    } catch (error) {
+      console.error("Controller Error:", error);
+      responseObject.status(500).json({ message: "Internal Server Error" });
+    }
+  }
+}
+
+export default TodoController;

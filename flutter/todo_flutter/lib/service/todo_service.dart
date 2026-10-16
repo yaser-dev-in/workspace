@@ -3,15 +3,17 @@ import 'package:dio/dio.dart';
 import '../model/todo_model.dart';
 
 class TodoService {
-  Dio dio = Dio(BaseOptions(baseUrl: "http://64.227.163.157:3000"));
+  // Ensure this matches your new docker-compose port (e.g., 3003)
+  Dio dio = Dio(BaseOptions(baseUrl: "http://intern1.gpstrack.in:3000"));
   String todoRoute = "/todo";
 
+  // 1. GET ALL -> NOW POST /todo/get-all
   Future<List<TodoModel>> getTodoArray(String userId) async {
     List<TodoModel> todoArray = [];
     try {
-      Response response = await dio.get(
-        todoRoute,
-        queryParameters: {"userId": userId},
+      Response response = await dio.post(
+        "$todoRoute/get-all",
+        data: {"userId": userId},
       );
       if (response.data == null) return todoArray;
       List<dynamic> dataArray = response.data as List<dynamic>;
@@ -24,11 +26,12 @@ class TodoService {
     return todoArray;
   }
 
+  // 2. CREATE -> POST /todo/create
   Future<TodoModel?> createTodo(TodoModel todoModel) async {
     try {
       Response response = await dio.post(
-        todoRoute,
-        data: {"todo": todoModel.toJson()},
+        "$todoRoute/create",
+        data: {"todoData": todoModel.toJson()},
       );
       if (response.data == null) return null;
       return TodoModel.fromJson(response.data as Map<String, dynamic>);
@@ -37,11 +40,12 @@ class TodoService {
     }
   }
 
+  // 3. UPDATE -> POST /todo/update
   Future<TodoModel?> updateTodo(TodoModel todoModel) async {
     try {
-      Response response = await dio.put(
-        "$todoRoute/${todoModel.id}",
-        data: {"todo": todoModel.toJson()},
+      Response response = await dio.post(
+        "$todoRoute/update",
+        data: {"todoData": todoModel.toJson()},
       );
       if (response.data == null) return null;
       return TodoModel.fromJson(response.data as Map<String, dynamic>);
@@ -50,11 +54,12 @@ class TodoService {
     }
   }
 
+  // 4. DELETE -> POST /todo/delete
   Future<bool> deleteTodo(TodoModel todoModel) async {
     try {
-      Response response = await dio.delete(
-        "$todoRoute/${todoModel.id}",
-        queryParameters: {"userId": todoModel.userId},
+      Response response = await dio.post(
+        "$todoRoute/delete",
+        data: {"todoId": todoModel.id, "userId": todoModel.userId},
       );
       return response.statusCode == 200;
     } on DioException catch (error) {
@@ -62,11 +67,12 @@ class TodoService {
     }
   }
 
+  // 5. COMPLETE ALL -> POST /todo/complete-all
   Future<bool> completeAllTodos(String userId) async {
     try {
-      Response response = await dio.put(
+      Response response = await dio.post(
         "$todoRoute/complete-all",
-        queryParameters: {"userId": userId},
+        data: {"userId": userId},
       );
       return response.statusCode == 200;
     } on DioException catch (error) {
@@ -74,11 +80,12 @@ class TodoService {
     }
   }
 
+  // 6. DELETE ALL -> POST /todo/delete-all
   Future<bool> deleteAllTodos(String userId) async {
     try {
-      Response response = await dio.delete(
+      Response response = await dio.post(
         "$todoRoute/delete-all",
-        queryParameters: {"userId": userId},
+        data: {"userId": userId},
       );
       return response.statusCode == 200;
     } on DioException catch (error) {

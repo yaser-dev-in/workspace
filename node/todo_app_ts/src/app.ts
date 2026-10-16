@@ -1,29 +1,17 @@
-import express
-from "express";
+import express from "express";
 
-import connectDatabase
-from "./config/database";
+import connectDatabase from "./config/database";
 
-import todoRoute
-from "./routes/todo_route";
+import todoRoute from "./routes/todo_route";
 
 const app = express();
 
-app.use(
-    express.json()
-);
+app.use(express.json());
 
-app.use(
-    todoRoute
-);
+app.use(todoRoute);
 
 connectDatabase();
 
-app.listen(
-    3000,
-    () => {
-        console.log(
-            "Server running on port 3000"
-        );
-    }
-);
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
+});

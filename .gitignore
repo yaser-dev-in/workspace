@@ -1,16 +1,6 @@
-# Node
-**/node_modules
-**/dist
-
-# Flutter
-**/.dart_tool
-**/build
-
-# VS Code
-.vscode
-
-# Environment
+node_modules/
 .env
-
-# Logs
-*.log
+.DS_Store
+*.iml
+build/
+.dart_tool/

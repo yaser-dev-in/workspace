@@ -1,20 +1,37 @@
-import { createTodo, getTodo, updateTodo, deleteTodo } from "../models/todo_model";
+import TodoModel from "../models/todo_model";
 import { ITodo } from "../interfaces/todo_interfaces";
 
-const createTodoService = async (todo: ITodo) => {
-  return await createTodo(todo);
-};
+class TodoService extends TodoModel {
+  
+  public async createTodoServiceMethod(todoData: ITodo): Promise<any> {
+    console.log("Service Layer: Validating and passing to Model...");
+    return await this.createDatabaseRecord(todoData);
+  }
 
-const getTodoService = async (userId: string) => {
-  return await getTodo(userId);
-};
+  public async getAllTodosServiceMethod(userId: string): Promise<any[]> {
+    console.log("Service Layer: Requesting data from Model...");
+    return await this.findAllRecordsByUserId(userId);
+  }
 
-const updateTodoService = async (id: number, userId: string, todo: Partial<ITodo>) => {
-  return await updateTodo(id, userId, todo);
-};
+  public async updateTodoServiceMethod(targetId: number, targetUserId: string, updatePayload: Partial<ITodo>): Promise<any> {
+    console.log("Service Layer: Sending update payload to Model...");
+    return await this.updateRecordById(targetId, targetUserId, updatePayload);
+  }
 
-const deleteTodoService = async (id: number, userId: string) => {
-  return await deleteTodo(id, userId);
-};
+  public async deleteTodoServiceMethod(targetId: number, targetUserId: string): Promise<any> {
+    console.log("Service Layer: Sending delete request to Model...");
+    return await this.deleteRecordById(targetId, targetUserId);
+  }
 
-export { createTodoService, getTodoService, updateTodoService, deleteTodoService };
+  public async completeAllTodosServiceMethod(userId: string): Promise<any> {
+    console.log("Service Layer: Sending complete-all to Model...");
+    return await this.completeAllRecordsByUserId(userId);
+  }
+
+  public async deleteAllTodosServiceMethod(userId: string): Promise<any> {
+    console.log("Service Layer: Sending delete-all to Model...");
+    return await this.deleteAllRecordsByUserId(userId);
+  }
+}
+
+export default TodoService;

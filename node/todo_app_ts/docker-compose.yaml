@@ -1,14 +1,19 @@
 services:
-  mongo_db:
+  yaser_mongo_db:
     image: mongo:7
-    container_name: mongo_db
+    container_name: yaser_mongo_db
     ports:
-      - "27017:27017"
+      - "3001:27017"
+    volumes:
+      - yaser_mongo_data:/data/db
 
-  node_app:
+  yaser_node_app:
     build: .
-    container_name: todo_app_container
+    container_name: yaser_todo_app_container
     ports:
       - "3000:3000"
     depends_on:
-      - mongo_db
+      - yaser_mongo_db
+
+volumes:
+  yaser_mongo_data:
